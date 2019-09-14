@@ -21,23 +21,11 @@ public class NavigationSteps {
     }
 
     @Step
-    public void fillRegisterUsername(String text){
-        myAccountPage.fillRegisterUsername(text);
+    public void clickOnSearch() {
+        navigationBarPage.clickOnSearch();
     }
-
     @Step
-    public void fillRegisterPassword(String text){
-        myAccountPage.fillRegisterPassword(text);
-    }
-
-    @Step
-    public void clickRegisterButton(){
-        myAccountPage.clickRegisterButton();
-    }
-
-    @StepGroup
-    public void createRegister(String username, String password) {
-        fillRegisterUsername(username);
-        fillRegisterPassword(password);
+    public void searchForItem(String item) {
+        navigationBarPage.searchForItem(item);
     }
 }

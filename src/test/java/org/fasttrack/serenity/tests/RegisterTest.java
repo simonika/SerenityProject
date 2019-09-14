@@ -5,8 +5,10 @@ import net.thucydides.core.annotations.Managed;
 import net.thucydides.core.annotations.ManagedPages;
 import net.thucydides.core.annotations.Steps;
 import net.thucydides.core.pages.Pages;
-import org.fasttrack.serenity.steps.EndUserSteps;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.fasttrack.serenity.steps.MyAccountSteps;
 import org.fasttrack.serenity.steps.NavigationSteps;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
@@ -24,16 +26,81 @@ public class RegisterTest {
     @Steps
     public NavigationSteps navigationSteps;
 
+    @Steps
+    public MyAccountSteps myAccountSteps;
+
     @Test
     public void registerTest(){
-        String username = "andrei@dede.com";
-        String password = "abcd1234!";
+        String  randomEmailPrefix = RandomStringUtils.randomAlphabetic(7);
+        String username = randomEmailPrefix + "@dede.com";
+        String password = "MyTest@1234!";
         navigationSteps.navigate();
 
         navigationSteps.clickOnMeniuByName("My account");
 
-        navigationSteps.createRegister(username, password);
-        System.out.println();
+        myAccountSteps.createRegister(username, password);
 
+        myAccountSteps.verifyRegister(randomEmailPrefix);
+    }
+
+    @Test
+    public void registerAndLogOutTest(){
+        String  randomEmailPrefix = RandomStringUtils.randomAlphabetic(7);
+        String username = randomEmailPrefix + "@dede.com";
+        String password = "MyTest@1234!";
+        navigationSteps.navigate();
+
+        navigationSteps.clickOnMeniuByName("My account");
+
+        myAccountSteps.createRegister(username, password);
+
+        myAccountSteps.verifyRegister(randomEmailPrefix);
+
+        myAccountSteps.logoutFromConfirmationMessage();
+
+        //assert that the register fields are empty
+        Assert.assertTrue("Register's username and paswword should be empty, but actually is:  " + myAccountSteps.isRegisterFormEmpty(),
+                myAccountSteps.isRegisterFormEmpty() == true);
+    }
+
+    @Test
+    public void registerAndLogOutFromMyAccountNavigationTest(){
+        String  randomEmailPrefix = RandomStringUtils.randomAlphabetic(7);
+        String username = randomEmailPrefix + "@dede.com";
+        String password = "MyTest@1234!";
+        String elementToNavigate = "LogOut";
+        navigationSteps.navigate();
+
+        navigationSteps.clickOnMeniuByName("My account");
+
+        myAccountSteps.createRegister(username, password);
+
+        myAccountSteps.verifyRegister(randomEmailPrefix);
+
+        myAccountSteps.myAccountNavigation(elementToNavigate);
+
+        //assert that the register fields are empty
+        Assert.assertTrue("Register's username and paswword should be empty, but actually is:  " + myAccountSteps.isRegisterFormEmpty(),
+                myAccountSteps.isRegisterFormEmpty() == true);
+    }
+
+    @Test
+    public void registerLogOutAndLoginTest(){
+        String  randomEmailPrefix = RandomStringUtils.randomAlphabetic(7);
+        String username = randomEmailPrefix + "@dede.com";
+        String password = "MyTest@1234!";
+        navigationSteps.navigate();
+
+        navigationSteps.clickOnMeniuByName("My account");
+
+        myAccountSteps.createRegister(username, password);
+
+        myAccountSteps.verifyRegister(randomEmailPrefix);
+
+        myAccountSteps.logoutFromConfirmationMessage();
+
+        //do login
+
+        //asertion
     }
 }
