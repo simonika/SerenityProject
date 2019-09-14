@@ -11,6 +11,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.fasttrack.serenity.steps.MyAccountSteps;
 import org.fasttrack.serenity.steps.NavigationSteps;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
@@ -31,21 +32,32 @@ public class SearchTest {
     @Steps
     public MyAccountSteps myAccountSteps;
 
-
-    @Test
-    public void searchTest(){
+    @Before
+    public void registerTest(){
         String  randomEmailPrefix = RandomStringUtils.randomAlphabetic(7);
         String username = randomEmailPrefix + "@dede.com";
         String password = "MyTest@1234!";
+        navigationSteps.navigate();
+
+        navigationSteps.clickOnMeniuByName("My account");
+
+        myAccountSteps.createRegister(username, password);
+
+        myAccountSteps.verifyRegister(randomEmailPrefix);
+    }
+
+
+    @Test
+    public void searchTest(){
 
         String item = "beanie";
-        navigationSteps.navigate();
 
         navigationSteps.clickOnMeniuByName("Shop");
 
         navigationSteps.clickOnSearch();
 
         navigationSteps.searchForItem(item);
+        System.out.println();
     }
 
 

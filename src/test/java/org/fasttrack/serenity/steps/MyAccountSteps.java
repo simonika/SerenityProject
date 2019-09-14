@@ -60,4 +60,41 @@ public class MyAccountSteps {
     public void myAccountNavigation(String elementToNavigate) {
         myAccountPage.myAccountNavigation(elementToNavigate);
     }
+
+    @StepGroup
+    public void login(String username, String password) {
+        fillLoginUsername(username);
+        fillLoginPassword(password);
+        clickLoginButton();
+    }
+
+    @Step
+    private void clickLoginButton() {
+        myAccountPage.clickLoginButton();
+    }
+
+    @Step
+    private void fillLoginPassword(String password) {
+        myAccountPage.fillLoginPassword(password);
+    }
+
+    @Step
+    private void fillLoginUsername(String username) {
+        myAccountPage.fillLoginUsername(username);
+    }
+
+    @Step
+    public void verifyPasswordStrength(String message) {
+        myAccountPage.verifyPasswordStrength(message);
+    }
+
+    @Step
+    public void registerButtonIsDisabled() {
+        myAccountPage.registerButtonIsDisabled();
+    }
+
+    @Step
+    public void registerButtonIsEnabled() {
+        myAccountPage.registerButtonIsEnabled();
+    }
 }

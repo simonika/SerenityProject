@@ -4,6 +4,7 @@ import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.PageObject;
 import net.serenitybdd.core.pages.WebElementFacade;
 import org.junit.Assert;
+import org.openqa.selenium.By;
 
 import java.time.Duration;
 import java.util.List;
@@ -28,6 +29,18 @@ public class MyAccountPage extends PageObject {
 
     @FindBy(css = "nav[class$='MyAccount-navigation'] li a")
     private List<WebElementFacade> myAccountNavigationList;
+
+    @FindBy(css = "div#customer_login #username")
+    private WebElementFacade loginUsername;
+
+    @FindBy(css = "div#customer_login #password")
+    private WebElementFacade loginPassword;
+
+    @FindBy(css = "div#customer_login button[name='login']")
+    private WebElementFacade loginButton;
+
+    @FindBy(css = "div[class*='password-strength']")
+    private WebElementFacade passwordCheckElement;
 
     public void fillRegisterUsername(String text){
 //        element(registerUsername).type(text);
@@ -73,5 +86,38 @@ public class MyAccountPage extends PageObject {
                 break;
             }
         }
+    }
+
+    public void fillLoginUsername(String username) {
+        typeInto(loginUsername, username);
+    }
+
+    public void fillLoginPassword(String password) {
+        typeInto(loginPassword, password);
+    }
+
+    public void clickLoginButton() {
+        element(loginButton).waitUntilClickable();
+        loginButton.click();
+    }
+
+    public void verifyPasswordStrength(String message) {
+        element(passwordCheckElement).waitUntilVisible();
+        String actualMessage = passwordCheckElement.getText();
+        Assert.assertTrue("The password strength message should be: " + message + ", not actually: " + actualMessage,
+                actualMessage.equalsIgnoreCase(message));
+    }
+
+    public void registerButtonIsDisabled() {
+        element(registerButton).waitUntilVisible();
+        Assert.assertTrue("The register button shouldn't be enabled: " + registerButton.isEnabled(),
+                registerButton.isDisabled() == true);
+
+    }
+
+    public void registerButtonIsEnabled() {
+        element(registerButton).waitUntilVisible();
+        Assert.assertTrue("The register button shouldn't be disabled: " + registerButton.isDisplayed(),
+                registerButton.isEnabled() == true);
     }
 }

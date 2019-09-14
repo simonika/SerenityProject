@@ -99,8 +99,60 @@ public class RegisterTest {
 
         myAccountSteps.logoutFromConfirmationMessage();
 
-        //do login
+        myAccountSteps.login(username, password);
 
-        //asertion
+        //assertion that we can see the username being logged in
+        myAccountSteps.verifyRegister(randomEmailPrefix);
+    }
+
+    @Test
+    public void checkWeakPasswordTest(){
+        String  randomEmailPrefix = RandomStringUtils.randomAlphabetic(7);
+        String username = randomEmailPrefix + "@dede.com";
+        String password = "MyTest";
+        String message = "Weak - Please enter a stronger password.";
+        navigationSteps.navigate();
+
+        navigationSteps.clickOnMeniuByName("My account");
+
+        myAccountSteps.fillRegisterUsername(username);
+        myAccountSteps.fillRegisterPassword(password);
+
+        myAccountSteps.verifyPasswordStrength(message);
+        myAccountSteps.registerButtonIsDisabled();
+    }
+
+    @Test
+    public void checkMediumPasswordTest(){
+        String  randomEmailPrefix = RandomStringUtils.randomAlphabetic(7);
+        String username = randomEmailPrefix + "@dede.com";
+        String password = "MyTest@12";
+        String message = "Medium";
+        navigationSteps.navigate();
+
+        navigationSteps.clickOnMeniuByName("My account");
+
+        myAccountSteps.fillRegisterUsername(username);
+        myAccountSteps.fillRegisterPassword(password);
+
+        myAccountSteps.verifyPasswordStrength(message);
+        myAccountSteps.registerButtonIsEnabled();
+    }
+
+    @Test
+    public void checkStrongPasswordTest(){
+        String  randomEmailPrefix = RandomStringUtils.randomAlphabetic(7);
+        String username = randomEmailPrefix + "@dede.com";
+        String password = "MyTest@1234!";
+        String message = "Strong";
+        navigationSteps.navigate();
+
+        navigationSteps.clickOnMeniuByName("My account");
+
+        myAccountSteps.fillRegisterUsername(username);
+        myAccountSteps.fillRegisterPassword(password);
+
+        myAccountSteps.verifyPasswordStrength(message);
+        myAccountSteps.registerButtonIsEnabled();
     }
 }
