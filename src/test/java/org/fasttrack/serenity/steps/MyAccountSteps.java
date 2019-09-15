@@ -97,4 +97,41 @@ public class MyAccountSteps {
     public void registerButtonIsEnabled() {
         myAccountPage.registerButtonIsEnabled();
     }
+
+    @Step
+    public void clickOnBillingAddressEdit() {
+        myAccountPage.clickOnBillingAddressEdit();
+    }
+    @StepGroup
+    public void fillBillingAddressDetails(String firstName, String lastName, String country) {
+        fillFirstNameInput(firstName);
+        fillLastNameInput(lastName);
+        selectRandomCountryFromDropdown();
+
+    }
+
+    @Step
+    public String getSelectedCountry(){
+        return  myAccountPage.getSelectedCountry();
+    }
+
+    @Step
+    private void selectFromCountryDropdown(String country) {
+        myAccountPage.selectFromCountryDropdown(country);
+    }
+
+    @Step
+    public void selectRandomCountryFromDropdown(){
+        myAccountPage.selectRandomCountryFromDropdown();
+    }
+
+    @Step
+    private void fillLastNameInput(String lastName) {
+        myAccountPage.fillLastNameInput(lastName);
+    }
+
+    @Step
+    private void fillFirstNameInput(String firstName) {
+        myAccountPage.fillFirstNameInput(firstName);
+    }
 }

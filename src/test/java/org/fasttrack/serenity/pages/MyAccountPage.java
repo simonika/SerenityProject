@@ -5,9 +5,11 @@ import net.serenitybdd.core.pages.PageObject;
 import net.serenitybdd.core.pages.WebElementFacade;
 import org.junit.Assert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.Select;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class MyAccountPage extends PageObject {
@@ -42,13 +44,26 @@ public class MyAccountPage extends PageObject {
     @FindBy(css = "div[class*='password-strength']")
     private WebElementFacade passwordCheckElement;
 
+    @FindBy(css = "a[href$='address=billing']")
+    private WebElementFacade billingAddressEditButton;
+
+    @FindBy(id = "billing_first_name")
+    private WebElementFacade firstNameInput;
+
+    @FindBy(id = "billing_last_name")
+    private WebElementFacade lastNameInput;
+
+//    @FindBy(xpath = "//*[@id='billing_country']")
+    @FindBy(id = "billing_country")
+    private WebElementFacade countryDropdown;
+
+    private String selectedCountry = "";
+
     public void fillRegisterUsername(String text){
-//        element(registerUsername).type(text);
         typeInto(registerUsername, text);
     }
 
     public void fillRegisterPassword(String text) {
-//        element(registerPassword).type(text);
         typeInto(registerPassword, text);
     }
 
@@ -119,5 +134,42 @@ public class MyAccountPage extends PageObject {
         element(registerButton).waitUntilVisible();
         Assert.assertTrue("The register button shouldn't be disabled: " + registerButton.isDisplayed(),
                 registerButton.isEnabled() == true);
+    }
+
+    public void clickOnBillingAddressEdit() {
+        element(billingAddressEditButton).waitUntilVisible();
+        billingAddressEditButton.click();
+    }
+
+    private int getRandomNumberBetween(int minNumber, int maxNumber) {
+        if (minNumber >= maxNumber) {
+            throw new IllegalArgumentException("maxNumber must be greater than minNumber");
+        }
+
+        Random r = new Random();
+        return r.nextInt((maxNumber - minNumber) + 1) + minNumber;
+    }
+
+    public void selectFromCountryDropdown(String country) {
+        selectFromDropdown(countryDropdown, country);
+    }
+
+    public void selectRandomCountryFromDropdown(){
+        Select select = new Select(countryDropdown);
+        int countryOptions = select.getOptions().size();
+        select.selectByIndex(getRandomNumberBetween(0, countryOptions));
+        selectedCountry = select.getFirstSelectedOption().getText();
+    }
+
+    public String getSelectedCountry(){
+        return selectedCountry;
+    }
+
+    public void fillLastNameInput(String lastName) {
+        typeInto(lastNameInput, lastName);
+    }
+
+    public void fillFirstNameInput(String firstName) {
+        typeInto(firstNameInput, firstName);
     }
 }
