@@ -4,15 +4,23 @@ import net.serenitybdd.core.annotations.findby.FindBy;
 import net.serenitybdd.core.pages.PageObject;
 import net.serenitybdd.core.pages.WebElementFacade;
 import org.junit.Assert;
-import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 public class MyAccountPage extends PageObject {
+
+    public MyAccountPage(WebDriver driver){
+        super(driver);
+    }
+
+    WebDriverWait wait = new WebDriverWait(getDriver(), 15);
 
     @FindBy(id = "reg_email")
     private WebElementFacade registerUsername;
@@ -53,9 +61,41 @@ public class MyAccountPage extends PageObject {
     @FindBy(id = "billing_last_name")
     private WebElementFacade lastNameInput;
 
-//    @FindBy(xpath = "//*[@id='billing_country']")
     @FindBy(id = "billing_country")
     private WebElementFacade countryDropdown;
+
+    @FindBy(id = "billing_address_1")
+    private WebElementFacade streetAddressInput;
+
+    @FindBy(id = "billing_city")
+    private WebElementFacade addressCityInput;
+
+    @FindBy(id = "billing_state")
+    private WebElementFacade addressStateDropdown;
+
+    @FindBy(id = "billing_postcode")
+    private WebElementFacade addressPostCodeInput;
+
+    @FindBy(id = "billing_phone")
+    private WebElementFacade addressPhoneInput;
+
+    @FindBy(id = "billing_email")
+    private WebElementFacade addressEmailInput;
+
+    @FindBy(css = "button[name='save_address']")
+    private WebElementFacade saveAddressButton;
+
+    @FindBy(css = "label[for='reg_password']")
+    private WebElementFacade passwordLabelElement;
+
+    @FindBy(css = "div.woocommerce-message")
+    private WebElementFacade addressUpdateElement;
+
+    @FindBy(xpath = "//div[contains(@class, 'Address')]/header/h3[contains(text(), 'Billing address')]/../../address")
+    private WebElementFacade billingAddressElement;
+
+    @FindBy(css = "ul.woocommerce-error li")
+    private List<WebElementFacade> addressErrorsList;
 
     private String selectedCountry = "";
 
@@ -68,12 +108,13 @@ public class MyAccountPage extends PageObject {
     }
 
     public void clickRegisterButton() {
-        element(registerButton).withTimeoutOf(Duration.ofSeconds(10)).waitUntilClickable();
+        element(registerButton).withTimeoutOf(Duration.ofSeconds(20)).waitUntilClickable();
         element(registerButton).click();
     }
 
     public void verifyRegister(String randomEmailPrefix) {
-        element(registerConfirmation).waitUntilEnabled();
+//        element(registerConfirmation).waitUntilEnabled();
+        element(registerConfirmation).withTimeoutOf(Duration.ofSeconds(30)).waitUntilEnabled();
         String actualMessage = registerConfirmation.getText();
         Assert.assertTrue("The confirmation message should contain: " + randomEmailPrefix + ", not actually: " + actualMessage,
                 actualMessage.contains(randomEmailPrefix));
@@ -117,7 +158,10 @@ public class MyAccountPage extends PageObject {
     }
 
     public void verifyPasswordStrength(String message) {
-        element(passwordCheckElement).waitUntilVisible();
+//        element(passwordCheckElement).withTimeoutOf(Duration.ofSeconds(20)).waitUntilVisible();
+        element(passwordLabelElement).waitUntilVisible();
+        passwordCheckElement.click();
+        waitFor(ExpectedConditions.visibilityOf(passwordCheckElement));
         String actualMessage = passwordCheckElement.getText();
         Assert.assertTrue("The password strength message should be: " + message + ", not actually: " + actualMessage,
                 actualMessage.equalsIgnoreCase(message));
@@ -171,5 +215,79 @@ public class MyAccountPage extends PageObject {
 
     public void fillFirstNameInput(String firstName) {
         typeInto(firstNameInput, firstName);
+    }
+
+    public void fillStreetAddress(String streetAddress) {
+        typeInto(streetAddressInput, streetAddress);
+    }
+
+    public void fillAddressCity(String city) {
+        typeInto(addressCityInput, city);
+    }
+
+    public void selectOrFillAddressState(String county) {
+        element(addressStateDropdown).isClickable();
+        if(addressStateDropdown.isCurrentlyEnabled() && addressStateDropdown.getAttribute("outerHTML").contains("select")) {
+            Select select = new Select(addressStateDropdown);
+            int stateOptions = select.getOptions().size();
+            select.selectByIndex(getRandomNumberBetween(0, stateOptions));
+        }else if(addressStateDropdown.isCurrentlyEnabled() && addressStateDropdown.getAttribute("outerHTML").contains("input")){
+            typeInto(addressStateDropdown, county);
+        }
+    }
+
+    public void fillAddressPostCode(String postCode) {
+        element(addressPostCodeInput).waitUntilClickable();
+        int i = 1;
+        do {
+            typeInto(addressPostCodeInput, postCode);
+            i++;
+        }while(!addressPostCodeInput.getAttribute("value").equals(postCode) || i > 5);
+    }
+
+    public void fillAddressPhone(String phone) {
+        typeInto(addressPhoneInput, phone);
+    }
+
+    public void verifyEmail(String email) {
+        element(addressEmailInput).waitUntilVisible();
+        String value = addressEmailInput.getAttribute("value");
+        Assert.assertTrue("The email: " + email + ", not actually: " + value,
+               value.equals(email));
+
+    }
+
+    public void clickSaveAddressButton() {
+        clickOn(saveAddressButton);
+    }
+
+    public void checkUpdatedMessageSuccessfully(String addressUpdatedMessage) {
+        wait.until(ExpectedConditions.visibilityOf(addressUpdateElement));
+//        element(addressUpdateElement).waitUntilVisible();
+        String value = addressUpdateElement.getText();
+        Assert.assertTrue("The address update message : " + addressUpdatedMessage + ", not actually: " + value,
+                value.equals(addressUpdatedMessage));
+    }
+
+    public void verifyAddressDetail(String detail) {
+        boolean foundDetail = false;
+        List<String> list = Arrays.asList(billingAddressElement.getText().split("\\n"));
+        for(String element : list){
+            if(element.trim().equals(detail)) {
+                foundDetail = true;
+            }
+        }
+
+        Assert.assertTrue("The address detail : " + detail + ", wasn't found ! ",
+                foundDetail == true);
+    }
+
+    public void checkAddressDetailError(String error) {
+        for(WebElementFacade item : addressErrorsList){
+            if(item.getText().equals(error)){
+                System.out.println("element: "+ item.getText());
+                break;
+            }
+        }
     }
 }

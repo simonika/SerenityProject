@@ -4,6 +4,8 @@ import net.thucydides.core.annotations.Step;
 import net.thucydides.core.annotations.StepGroup;
 import org.fasttrack.serenity.pages.MyAccountPage;
 
+import java.util.List;
+
 public class MyAccountSteps {
 
     MyAccountPage myAccountPage;
@@ -28,6 +30,14 @@ public class MyAccountSteps {
     public void createRegister(String username, String password) {
         fillRegisterUsername(username);
         fillRegisterPassword(password);
+        clickRegisterButton();
+    }
+
+    @StepGroup
+    public void createRegisterAndCheckStrength(String username, String password, String message) {
+        fillRegisterUsername(username);
+        fillRegisterPassword(password);
+        verifyPasswordStrength(message);
         clickRegisterButton();
     }
 
@@ -102,12 +112,75 @@ public class MyAccountSteps {
     public void clickOnBillingAddressEdit() {
         myAccountPage.clickOnBillingAddressEdit();
     }
+
     @StepGroup
-    public void fillBillingAddressDetails(String firstName, String lastName, String country) {
+    public void fillBillingAddressDetails(String firstName, String lastName, String country, String streetAddress, String city, String county, String postCode, String phone, String email) {
         fillFirstNameInput(firstName);
         fillLastNameInput(lastName);
-        selectRandomCountryFromDropdown();
+        if(country == null || country.isEmpty()) {
+            selectRandomCountryFromDropdown();
+        }else{
+            selectFromCountryDropdown(country);
+        }
+        fillStreetAddress(streetAddress);
+        fillAddressCity(city);
+        selectOrFillAddressState(county);
+        fillAddressPostCode(postCode);
+        fillAddressPhone(phone);
+        verifyEmail(email);
+        clickSaveAddressButton();
 
+    }
+    @StepGroup
+    public void fillBillingAddressDetailsCheckout(String firstName, String lastName, String country, String streetAddress, String city, String county, String postCode, String phone, String email) {
+        fillFirstNameInput(firstName);
+        fillLastNameInput(lastName);
+        if(country == null || country.isEmpty()) {
+            selectRandomCountryFromDropdown();
+        }else{
+            selectFromCountryDropdown(country);
+        }
+        fillStreetAddress(streetAddress);
+        fillAddressCity(city);
+        selectOrFillAddressState(county);
+        fillAddressPostCode(postCode);
+        fillAddressPhone(phone);
+        verifyEmail(email);
+
+    }
+    @Step
+    public void clickSaveAddressButton() {
+        myAccountPage.clickSaveAddressButton();
+    }
+
+    @Step
+    private void verifyEmail(String email) {
+        myAccountPage.verifyEmail(email);
+    }
+
+    @Step
+    private void fillAddressPhone(String phone) {
+        myAccountPage.fillAddressPhone(phone);
+    }
+
+    @Step
+    private void fillAddressPostCode(String postCode) {
+        myAccountPage.fillAddressPostCode(postCode);
+    }
+
+    @Step
+    private void selectOrFillAddressState(String county) {
+        myAccountPage.selectOrFillAddressState(county);
+    }
+
+    @Step
+    private void fillAddressCity(String city) {
+        myAccountPage.fillAddressCity(city);
+    }
+
+    @Step
+    private void fillStreetAddress(String streetAddress) {
+        myAccountPage.fillStreetAddress(streetAddress);
     }
 
     @Step
@@ -133,5 +206,25 @@ public class MyAccountSteps {
     @Step
     private void fillFirstNameInput(String firstName) {
         myAccountPage.fillFirstNameInput(firstName);
+    }
+
+    @Step
+    public void checkUpdatedMessageSuccessfully(String addressUpdatedMessage) {
+        myAccountPage.checkUpdatedMessageSuccessfully(addressUpdatedMessage);
+    }
+
+    @Step
+    public void verifyAllUpdatedAddressDetails(List<String> addressDetailsList) {
+        for(String detail : addressDetailsList){
+            myAccountPage.verifyAddressDetail(detail);
+        }
+    }
+
+    @Step
+    public void checkAddressUpdateErrors(List<String> listOfErrors) {
+        for(String error : listOfErrors) {
+            if(error.length() > 0)
+            myAccountPage.checkAddressDetailError(error);
+        }
     }
 }

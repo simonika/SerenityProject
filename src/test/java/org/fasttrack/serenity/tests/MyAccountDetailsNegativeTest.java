@@ -1,10 +1,12 @@
 package org.fasttrack.serenity.tests;
 
-import net.serenitybdd.junit.runners.SerenityRunner;
+import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.thucydides.core.annotations.Managed;
 import net.thucydides.core.annotations.ManagedPages;
 import net.thucydides.core.annotations.Steps;
 import net.thucydides.core.pages.Pages;
+import net.thucydides.junit.annotations.Qualifier;
+import net.thucydides.junit.annotations.UseTestDataFrom;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.fasttrack.serenity.steps.MyAccountSteps;
 import org.fasttrack.serenity.steps.NavigationSteps;
@@ -16,8 +18,41 @@ import org.openqa.selenium.WebDriver;
 import java.util.Arrays;
 import java.util.List;
 
-@RunWith(SerenityRunner.class)
-public class MyAccountDetailsTest {
+@RunWith(SerenityParameterizedRunner.class)
+@UseTestDataFrom(value = "resources/addressNegative.csv")
+public class MyAccountDetailsNegativeTest {
+    private String testNo;
+    private String country;
+    private String error;
+
+    public String getTestNo() {
+        return testNo;
+    }
+
+    public void setTestNo(String testNo) {
+        this.testNo = testNo;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
+    @Qualifier
+    public String getQualifier() {
+        return country;
+    }
 
     @Managed(uniqueSession = true)
     public WebDriver webdriver;
@@ -49,33 +84,19 @@ public class MyAccountDetailsTest {
     }
 
     @Test
-    public void accountAddressTest(){
-        String randomString = RandomStringUtils.randomAlphabetic(7);
-        String firstName = "first_name_" + randomString ;
-        String lastName = "last_name_" + randomString ;
-        String country = null;
+    public void myAccountDetailsNegativeTest(){
         String elementToNavigate = "Addresses";
-        String streetAddress = "street number "+ randomString;
-        String city = "city_"+randomString;
-        String county = "county_"+randomString;
-        String postCode = RandomStringUtils.randomNumeric(6);
-        String phoneNumber = "0"+ RandomStringUtils.randomNumeric(9);
-        String addressUpdatedMessage = "Address changed successfully.";
+
+        List<String> listOfErrors = Arrays.asList(error.split("[||]"));
 
         myAccountSteps.myAccountNavigation(elementToNavigate);
 
         myAccountSteps.clickOnBillingAddressEdit();
+        
+        myAccountSteps.clickSaveAddressButton();
 
-        myAccountSteps.fillBillingAddressDetails(firstName, lastName, country, streetAddress, city, county, postCode, phoneNumber, username);
+        myAccountSteps.checkAddressUpdateErrors(listOfErrors);
 
-        if(country == null){
-            country = myAccountSteps.getSelectedCountry();
-        }
-
-        myAccountSteps.checkUpdatedMessageSuccessfully(addressUpdatedMessage);
-
-        List<String> addressDetailsList = Arrays.asList(firstName+" "+lastName, country, streetAddress, city, postCode);
-        myAccountSteps.verifyAllUpdatedAddressDetails(addressDetailsList);
 
     }
 

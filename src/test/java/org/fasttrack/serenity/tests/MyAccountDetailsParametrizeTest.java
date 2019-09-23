@@ -1,10 +1,12 @@
 package org.fasttrack.serenity.tests;
 
-import net.serenitybdd.junit.runners.SerenityRunner;
+import net.serenitybdd.junit.runners.SerenityParameterizedRunner;
 import net.thucydides.core.annotations.Managed;
 import net.thucydides.core.annotations.ManagedPages;
 import net.thucydides.core.annotations.Steps;
 import net.thucydides.core.pages.Pages;
+import net.thucydides.junit.annotations.Qualifier;
+import net.thucydides.junit.annotations.UseTestDataFrom;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.fasttrack.serenity.steps.MyAccountSteps;
 import org.fasttrack.serenity.steps.NavigationSteps;
@@ -16,8 +18,41 @@ import org.openqa.selenium.WebDriver;
 import java.util.Arrays;
 import java.util.List;
 
-@RunWith(SerenityRunner.class)
-public class MyAccountDetailsTest {
+@RunWith(SerenityParameterizedRunner.class)
+@UseTestDataFrom(value = "resources/address.csv")
+public class MyAccountDetailsParametrizeTest {
+    private String testNo;
+    private String country;
+    private String error;
+
+    public String getTestNo() {
+        return testNo;
+    }
+
+    public void setTestNo(String testNo) {
+        this.testNo = testNo;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
+    @Qualifier
+    public String getQualifier() {
+        return country;
+    }
 
     @Managed(uniqueSession = true)
     public WebDriver webdriver;
@@ -49,11 +84,10 @@ public class MyAccountDetailsTest {
     }
 
     @Test
-    public void accountAddressTest(){
+    public void myAccountDetailsParametrizesTest(){
         String randomString = RandomStringUtils.randomAlphabetic(7);
         String firstName = "first_name_" + randomString ;
         String lastName = "last_name_" + randomString ;
-        String country = null;
         String elementToNavigate = "Addresses";
         String streetAddress = "street number "+ randomString;
         String city = "city_"+randomString;
@@ -65,10 +99,10 @@ public class MyAccountDetailsTest {
         myAccountSteps.myAccountNavigation(elementToNavigate);
 
         myAccountSteps.clickOnBillingAddressEdit();
-
+        
         myAccountSteps.fillBillingAddressDetails(firstName, lastName, country, streetAddress, city, county, postCode, phoneNumber, username);
 
-        if(country == null){
+        if(country == null || country.isEmpty()){
             country = myAccountSteps.getSelectedCountry();
         }
 
@@ -77,6 +111,9 @@ public class MyAccountDetailsTest {
         List<String> addressDetailsList = Arrays.asList(firstName+" "+lastName, country, streetAddress, city, postCode);
         myAccountSteps.verifyAllUpdatedAddressDetails(addressDetailsList);
 
+        //assert that the register fields are empty
+//        Assert.assertTrue("Register's username and paswword should be empty, but actually is:  " + myAccountSteps.isRegisterFormEmpty(),
+//                myAccountSteps.isRegisterFormEmpty() == true);
     }
 
 }

@@ -31,4 +31,23 @@ public class NavigationSteps extends ScenarioSteps {
     public void searchForItem(String item) {
         navigationBarPage.searchForItem(item);
     }
+
+    @Step
+    public void checkDefaultQuantityIntoCart() {
+        navigationBarPage.checkDefaultQuantityIntoCart();
+    }
+    @Step
+    public void checkUpdatedQuantity(String quantity){
+        navigationBarPage.updatedQuantityIntoCart(quantity);
+    }
+
+    @Step
+    public void refreshBrowser() {
+        navigationBarPage.refreshBrowser();
+
+    }
+
+    public void checkPageTitle(String title) {
+        navigationBarPage.checkPageTitle(title);
+    }
 }
